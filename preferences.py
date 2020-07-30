@@ -1,0 +1,38 @@
+import bpy
+
+class IGcodePreferences(bpy.types.AddonPreferences):
+    bl_idname = __package__
+
+    def draw(self, context):
+
+        import importlib
+        from .utils_pip import Pip
+        Pip._ensure_user_site_package()
+
+        layout = self.layout       
+        flag = importlib.util.find_spec('regex') is not None and importlib.util.find_spec('tqdm') is not None
+        if flag:
+            layout.label(text='Regex and Tqdm loaded.', icon='INFO')
+        else:
+            layout.label(text='import-G-code requires Regex and Tqdm!', icon='ERROR')
+            row = layout.row()
+            row.operator('igcode.installer')
+
+class IGcodeInstaller(bpy.types.Operator):
+    bl_idname = "igcode.installer"
+    bl_label = "Install Regex and Tqdm"
+    bl_description = ("Install Regex and Tqdm")
+
+    def execute(self, context):
+        try:
+            from .utils_pip import Pip
+            # Pip.upgrade_pip()
+            Pip.install('regex')
+            Pip.install('tqdm')
+
+            import re
+            import tqdm
+            self.report({'INFO'}, 'Successfully installed Re and Tqdm.')
+        except:
+            self.report({'ERROR'}, 'Could not install Regex and Tqdm, Kindly install it manually.')
+        return {'FINISHED'}
