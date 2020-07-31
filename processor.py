@@ -40,13 +40,15 @@ class ImportGcode(bpy.types.Operator, ImportHelper):
             yield x[i:i + n]
 
     @staticmethod
-    def split_vertex(index):
-        layer.data.splines[index].bezier_points[1].select_control_point = True
+    def split_vertex(index, layer):        
+        ops.curve.select_all(action='DESELECT')
+        layer.data.splines[index].bezier_points[-1].select_control_point = True
+        layer.data.splines[index].bezier_points[-2].select_control_point = True
         ops.curve.delete(type='SEGMENT')
         ops.curve.select_all(action='DESELECT')
-        index += 1
+        layer.data.splines[-1].bezier_points[-1].select_control_point = True
 
-        layer.data.splines[index].bezier_points[0].select_control_point = True
+        index += 1
         return index
 
     def execute(self, context):
@@ -60,26 +62,32 @@ class ImportGcode(bpy.types.Operator, ImportHelper):
         obj_collection = bpy.data.collections.new(filename)
         context.scene.collection.children.link(obj_collection)
 
-        filtered_lines=[[]]
+        layered_gcodes=[[]]
         vertices = [[]]
-        count = -1
 
-        pattern = re.compile(r'(;LAYER:|G[0|1] [F|X][a-zA-Z0-9. ]+ [E|Y][0-9. ]+\d\s$)')
-        sub_pattern = re.compile(r'G(?P<G>[0|1])\s?[a-zA-Z0-9]*\sX(?P<X>[0-9.]*)\sY(?P<Y>[0-9.]*)')
+        pattern = re.compile(r';LAYER:|G[0|1]')
+        sub_pattern = re.compile(r'G(?P<G>[0|1])\s?[a-zA-Z0-9.]*\sX(?P<X>[0-9.]*)\sY(?P<Y>[0-9.]*)')
 
-        with open(self.filepath, 'r') as file:
-            line = file.readline()
-            while(line):
+        with open(self.filepath, 'r') as f:
+            lines = f.readlines()
+
+            for i, line in enumerate(lines):
                 matches = pattern.finditer(line)
                 for match in matches:
                     if(line[0] == ';'):
-                        count += 1
-                        filtered_lines.append([])
+                        layered_gcodes.append([])
                     else:
-                        filtered_lines[count].append(line)
-                line = file.readline()
+                        if re.search(r'\w*[X|Y][0-9. a-zA-z]', line):
+                            if re.search(r'E[0-9.]*', line):
+                                layered_gcodes[-1].append(line)
+                            else:
+                                if i+1<len(lines):
+                                    if re.search(r'E[0-9.]*', lines[i+1]):
+                                        layered_gcodes[-1].append(line)
 
-        for i, layer in tqdm(enumerate(filtered_lines)):
+        layered_gcodes.pop(0)
+
+        for i, layer in tqdm(enumerate(layered_gcodes)):
             z = i*self.layer_height
             for j, line in enumerate(layer):
                 match = sub_pattern.search(line)
@@ -87,19 +95,24 @@ class ImportGcode(bpy.types.Operator, ImportHelper):
                     x = round(float(match.group('X')), 3)
                     y = round(float(match.group('Y')), 3)
                     g = int(match.group('G'))
-
-                    if g==0:
-                        if j+1 < len(layer):
-                            if int(re.search(r'G([0|1])', layer[j+1]).group(1))==1:
-                                vertices[i].append((g, round(x, 3), round(y, 3), z))                    
-                    else:
-                        vertices[i].append((g, round(x, 3), round(y, 3), z))            
+                    
+                    vertices[i].append((g, round(x, 3), round(y, 3), z))            
+                else:
+                    print(line)
                 
             vertices.append([])
+
+        # SAFETY NET
+        for i in range(0, len(vertices)):
+            for j in range(0, len(vertices[i])):
+                if j+1 < len(vertices[i]):
+                    if vertices[i][j][0] == 0 and vertices[i][j+1][0] == 0:
+                        vertices[i].pop(j)
 
         count = 1
         for _batch in self.batches(vertices, batch_size):
             for _layer in _batch:
+
                 if len(_layer)>0:
                     index = 0
                     ops.curve.primitive_bezier_curve_add(location=_layer[0][1:],radius=0, enter_editmode=True)
@@ -115,23 +128,31 @@ class ImportGcode(bpy.types.Operator, ImportHelper):
                     layer.data.splines[index].bezier_points[0].handle_left_type = 'VECTOR'
                     layer.data.splines[index].bezier_points[0].handle_right_type = 'VECTOR'
                     
-                    for v in tqdm(_layer):
+                    for v in tqdm(_layer[1:]):
                         ops.curve.vertex_add(location=v[1:])                
-                        if(v[0]==0):
-                            try:
-                                index = self.split_vertex(index) 
-                            except:
-                                pass                           
+                        if v[0] == 0:
+                            ops.curve.select_all(action='DESELECT')
+                            layer.data.splines[index].bezier_points[-1].select_control_point = True
+                            layer.data.splines[index].bezier_points[-2].select_control_point = True
+                    
+                            ops.curve.delete(type='SEGMENT')
+                        
+                            ops.curve.select_all(action='DESELECT')
+                            layer.data.splines[-1].bezier_points[-1].select_control_point = True        
+                        
+                            index += 1                    
                     
                     ops.object.editmode_toggle()
                     context.object.data.twist_mode = 'Z_UP'
-                    context.object.data.bevel_depth = self.nozzle_dia
+                    context.object.data.bevel_depth = self.nozzle_dia/2
 
                     obj_collection.objects.link(layer)
-                    bpy.data.collections[0].objects.unlink(layer)
+                    bpy.data.collections['Collection'].objects.unlink(layer)
                     
                     ops.object.select_all(action='DESELECT')            
                     count += 1
+
+                        
                 
         print("\nEXPORTED "+ str(i) +" LAYERS TO 3D-VIEWPORT :)\n")
                     
