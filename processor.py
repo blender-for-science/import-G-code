@@ -96,18 +96,17 @@ class ImportGcode(bpy.types.Operator, ImportHelper):
                     y = round(float(match.group('Y')), 3)
                     g = int(match.group('G'))
                     
-                    vertices[i].append((g, round(x, 3), round(y, 3), z))            
-                else:
-                    print(line)
+                    if g == 0:
+                        if j+1 < len(layer):
+                            if sub_pattern.search(layer[j+1]).group('G') != '0':
+                                vertices[i].append((g, round(x, 3), round(y, 3), z))
+                        else:
+                            vertices[i].append((g, round(x, 3), round(y, 3), z))
+
+                    else:
+                        vertices[i].append((g, round(x, 3), round(y, 3), z))
                 
             vertices.append([])
-
-        # SAFETY NET
-        for i in range(0, len(vertices)):
-            for j in range(0, len(vertices[i])):
-                if j+1 < len(vertices[i]):
-                    if vertices[i][j][0] == 0 and vertices[i][j+1][0] == 0:
-                        vertices[i].pop(j)
 
         count = 1
         for _batch in self.batches(vertices, batch_size):
