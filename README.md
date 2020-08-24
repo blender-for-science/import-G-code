@@ -1,4 +1,5 @@
 # import-G-code
+[![Gitter](https://badges.gitter.im/blender-for-science/community.svg)](https://gitter.im/blender-for-science/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
 Imports G-code files into Blender 2.80+ as a collection of layers which can then be animated or exported.
 
 ![suzanne](suzanne.png)
