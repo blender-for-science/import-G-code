@@ -1,5 +1,8 @@
 # import-G-code
+[![Blender](https://img.shields.io/badge/Blender-2.80%2B-orange)](https://www.blender.org/)
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/b11bd990376a4995a9f9e5d830d20e24)](https://app.codacy.com/gh/blender-for-science/import-G-code?utm_source=github.com&utm_medium=referral&utm_content=blender-for-science/import-G-code&utm_campaign=Badge_Grade_Dashboard)
+[![Release](https://img.shields.io/github/v/release/blender-for-science/import-G-code)](https://github.com/blender-for-science/import-G-code/releases)
+[![License](https://img.shields.io/github/license/blender-for-science/import-G-code)](https://github.com/blender-for-science/import-G-code/blob/master/LICENSE.md)
 [![Gitter](https://badges.gitter.im/blender-for-science/community.svg)](https://gitter.im/blender-for-science/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
 
 Imports G-code files into Blender 2.80+ as a collection of layers which can then be animated or exported.
