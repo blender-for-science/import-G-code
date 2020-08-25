@@ -37,18 +37,6 @@ class ImportGcode(bpy.types.Operator, ImportHelper):
         for i in range(0, len(x), n):
             yield x[i:i + n]
 
-    @staticmethod
-    def split_vertex(index, layer):
-        ops.curve.select_all(action='DESELECT')
-        layer.data.splines[index].bezier_points[-1].select_control_point = True
-        layer.data.splines[index].bezier_points[-2].select_control_point = True
-        ops.curve.delete(type='SEGMENT')
-        ops.curve.select_all(action='DESELECT')
-        layer.data.splines[-1].bezier_points[-1].select_control_point = True
-
-        index += 1
-        return index
-
     def execute(self, context):
         import re
         from tqdm import tqdm
@@ -119,10 +107,9 @@ class ImportGcode(bpy.types.Operator, ImportHelper):
                     ops.curve.select_random()
                     ops.curve.delete(type='VERT')
                     ops.curve.select_random()
-
                     layer.data.splines[index].bezier_points[0].handle_left_type = 'VECTOR'
                     layer.data.splines[index].bezier_points[0].handle_right_type = 'VECTOR'
-                    
+
                     for v in tqdm(_layer[1:]):
                         ops.curve.vertex_add(location=v[1:])
                         if v[0] == 0:
