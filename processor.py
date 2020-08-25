@@ -1,12 +1,7 @@
 import bpy
 from bpy import ops
 from bpy_extras.io_utils import ImportHelper
-from bpy.props import (
-        StringProperty,
-        BoolProperty,
-        EnumProperty,
-        FloatProperty,
-        )
+from bpy.props import StringProperty, BoolProperty, EnumProperty, FloatProperty
 
 class ImportGcode(bpy.types.Operator, ImportHelper):
     bl_idname = "igcode.gcode"
@@ -116,9 +111,7 @@ class ImportGcode(bpy.types.Operator, ImportHelper):
                             ops.curve.select_all(action='DESELECT')
                             layer.data.splines[index].bezier_points[-1].select_control_point = True
                             layer.data.splines[index].bezier_points[-2].select_control_point = True
-                    
                             ops.curve.delete(type='SEGMENT')
-                        
                             ops.curve.select_all(action='DESELECT')
                             layer.data.splines[-1].bezier_points[-1].select_control_point = True
                             index += 1

@@ -31,8 +31,12 @@ class IGcodeInstaller(bpy.types.Operator):
             Pip.install('tqdm')
 
             import re
-            import tqdm
+            from tqdm import tqdm
+
+            for i in tqdm(range(1)):
+                print(re.__version__)
+
             self.report({'INFO'}, 'Successfully installed Re and Tqdm.')
-        except:
+        except ModuleNotFoundError:
             self.report({'ERROR'}, 'Could not install Regex and Tqdm, Kindly install it manually.')
         return {'FINISHED'}
