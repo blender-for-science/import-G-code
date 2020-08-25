@@ -1,7 +1,7 @@
 import bpy
 from bpy import ops
 from bpy_extras.io_utils import ImportHelper
-from bpy.props import StringProperty, BoolProperty, EnumProperty, FloatProperty
+from bpy.props import StringProperty, FloatProperty
 
 class ImportGcode(bpy.types.Operator, ImportHelper):
     bl_idname = "igcode.gcode"
@@ -126,6 +126,5 @@ class ImportGcode(bpy.types.Operator, ImportHelper):
                     count += 1
 
         print("\nEXPORTED "+ str(i) +" LAYERS TO 3D-VIEWPORT :)\n")
-                    
         self.report({'INFO'}, 'Successfully imported {}'.format(filename))
         return {'FINISHED'}

@@ -33,7 +33,7 @@ class IGcodeInstaller(bpy.types.Operator):
             import re
             from tqdm import tqdm
 
-            for i in tqdm(range(1)):
+            for _ in tqdm(range(1)):
                 print(re.__version__)
 
             self.report({'INFO'}, 'Successfully installed Re and Tqdm.')
