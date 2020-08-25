@@ -28,9 +28,10 @@ bl_info = {
     "author" : "Senthur Raj",
     "description" : "Imports G-code files into Blender 2.80+ as a collection of layers.",
     "blender" : (2, 80, 0),
-    "version" : (1, 0, 0),
+    "version" : (1, 1, 0),
     "location" : "File > Import-Export",
     "warning" : "",
+    "wiki_url" : "https://github.com/blender-for-science/import-G-code",
     "tracker_url" : "https://github.com/blender-for-science/import-G-code/issues",
     "category" : "Import-Export"
 }
