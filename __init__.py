@@ -1,12 +1,3 @@
-'''
--------------------
-Blender for Science
--------------------
-Add-on: import-G-code
-Author: Senthur Raj (Github: imsenthur)
-Description: Imports G-code files into Blender 2.80+ as a collection of layers which can then be animated or exported.
-'''
-
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation; either version 3 of the License, or
@@ -20,6 +11,18 @@ Description: Imports G-code files into Blender 2.80+ as a collection of layers w
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
+#################################################
+
+# -------------------
+# Blender for Science
+# -------------------
+# Add-on: import-G-code
+# Author: Senthur Raj (Github: imsenthur)
+# Description: Imports G-code files into Blender 2.80+ as a collection of layers which can then be animated or exported.
+# https://github.com/blender-for-science/import-G-code
+
+#################################################
+
 bl_info = {
     "name" : "Import-G-code",
     "author" : "Senthur Raj",
@@ -28,6 +31,7 @@ bl_info = {
     "version" : (1, 0, 0),
     "location" : "File > Import-Export",
     "warning" : "",
+    "tracker_url" : "https://github.com/blender-for-science/import-G-code/issues",
     "category" : "Import-Export"
 }
 
