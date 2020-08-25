@@ -1,14 +1,7 @@
 import bpy
-import os
-from bpy import context, ops
+from bpy import ops
 from bpy_extras.io_utils import ImportHelper
-from bpy.props import (
-        CollectionProperty,
-        StringProperty,
-        BoolProperty,
-        EnumProperty,
-        FloatProperty,
-        )
+from bpy.props import StringProperty, FloatProperty
 
 class ImportGcode(bpy.types.Operator, ImportHelper):
     bl_idname = "igcode.gcode"
@@ -19,18 +12,18 @@ class ImportGcode(bpy.types.Operator, ImportHelper):
     filename_ext = ".gcode"
 
     layer_height : FloatProperty(
-            name="Layer height:",
-            default=0.25,
+            name="Layer height",
+            default=0.2,
             min=0.1,
-            max = 5.0,
+            max=5.0,
             precision=3,
             description="Layer height")
 
     nozzle_dia : FloatProperty(
-            name="Nozzle Diameter:",
+            name="Nozzle Diameter",
             default=0.4,
             min=0.1,
-            max = 5.0,
+            max=5.0,
             precision=3,
             description="Nozzle Diameter")
 
@@ -39,20 +32,7 @@ class ImportGcode(bpy.types.Operator, ImportHelper):
         for i in range(0, len(x), n):
             yield x[i:i + n]
 
-    @staticmethod
-    def split_vertex(index, layer):        
-        ops.curve.select_all(action='DESELECT')
-        layer.data.splines[index].bezier_points[-1].select_control_point = True
-        layer.data.splines[index].bezier_points[-2].select_control_point = True
-        ops.curve.delete(type='SEGMENT')
-        ops.curve.select_all(action='DESELECT')
-        layer.data.splines[-1].bezier_points[-1].select_control_point = True
-
-        index += 1
-        return index
-
     def execute(self, context):
-        scene = context.scene
         import re
         from tqdm import tqdm
 
@@ -95,7 +75,6 @@ class ImportGcode(bpy.types.Operator, ImportHelper):
                     x = round(float(match.group('X')), 3)
                     y = round(float(match.group('Y')), 3)
                     g = int(match.group('G'))
-                    
                     if g == 0:
                         if j+1 < len(layer):
                             if sub_pattern.search(layer[j+1]).group('G') != '0':
@@ -105,7 +84,7 @@ class ImportGcode(bpy.types.Operator, ImportHelper):
 
                     else:
                         vertices[i].append((g, round(x, 3), round(y, 3), z))
-                
+
             vertices.append([])
 
         count = 1
@@ -123,38 +102,29 @@ class ImportGcode(bpy.types.Operator, ImportHelper):
                     ops.curve.select_random()
                     ops.curve.delete(type='VERT')
                     ops.curve.select_random()
-
                     layer.data.splines[index].bezier_points[0].handle_left_type = 'VECTOR'
                     layer.data.splines[index].bezier_points[0].handle_right_type = 'VECTOR'
-                    
+
                     for v in tqdm(_layer[1:]):
-                        ops.curve.vertex_add(location=v[1:])                
+                        ops.curve.vertex_add(location=v[1:])
                         if v[0] == 0:
                             ops.curve.select_all(action='DESELECT')
                             layer.data.splines[index].bezier_points[-1].select_control_point = True
                             layer.data.splines[index].bezier_points[-2].select_control_point = True
-                    
                             ops.curve.delete(type='SEGMENT')
-                        
                             ops.curve.select_all(action='DESELECT')
-                            layer.data.splines[-1].bezier_points[-1].select_control_point = True        
-                        
-                            index += 1                    
-                    
+                            layer.data.splines[-1].bezier_points[-1].select_control_point = True
+                            index += 1
+
                     ops.object.editmode_toggle()
                     context.object.data.twist_mode = 'Z_UP'
                     context.object.data.bevel_depth = self.nozzle_dia/2
 
                     obj_collection.objects.link(layer)
                     bpy.data.collections['Collection'].objects.unlink(layer)
-                    
-                    ops.object.select_all(action='DESELECT')            
+                    ops.object.select_all(action='DESELECT')
                     count += 1
 
-                        
-                
         print("\nEXPORTED "+ str(i) +" LAYERS TO 3D-VIEWPORT :)\n")
-                    
         self.report({'INFO'}, 'Successfully imported {}'.format(filename))
         return {'FINISHED'}
-

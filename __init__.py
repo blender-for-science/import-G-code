@@ -11,14 +11,28 @@
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
+#################################################
+
+# -------------------
+# Blender for Science
+# -------------------
+# Add-on: import-G-code
+# Author: Senthur Raj (Github: imsenthur)
+# Description: Imports G-code files into Blender 2.80+ as a collection of layers which can then be animated or exported.
+# https://github.com/blender-for-science/import-G-code
+
+#################################################
+
 bl_info = {
     "name" : "Import-G-code",
     "author" : "Senthur Raj",
     "description" : "Imports G-code files into Blender 2.80+ as a collection of layers.",
     "blender" : (2, 80, 0),
-    "version" : (1, 0, 0),
+    "version" : (1, 1, 0),
     "location" : "File > Import-Export",
     "warning" : "",
+    "wiki_url" : "https://github.com/blender-for-science/import-G-code",
+    "tracker_url" : "https://github.com/blender-for-science/import-G-code/issues",
     "category" : "Import-Export"
 }
 
@@ -33,12 +47,10 @@ def register():
     bpy.utils.register_class(IGcodePreferences)
     bpy.utils.register_class(IGcodeInstaller)
     bpy.utils.register_class(ImportGcode)
-    
     bpy.types.TOPBAR_MT_file_import.append(menu_func_import)
 
 def unregister():
     bpy.utils.unregister_class(IGcodePreferences)
     bpy.utils.unregister_class(IGcodeInstaller)
     bpy.utils.unregister_class(ImportGcode)
-
     bpy.types.TOPBAR_MT_file_import.remove(menu_func_import)

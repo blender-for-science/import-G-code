@@ -9,7 +9,7 @@ class IGcodePreferences(bpy.types.AddonPreferences):
         from .utils_pip import Pip
         Pip._ensure_user_site_package()
 
-        layout = self.layout       
+        layout = self.layout
         flag = importlib.util.find_spec('regex') is not None and importlib.util.find_spec('tqdm') is not None
         if flag:
             layout.label(text='Regex and Tqdm loaded.', icon='INFO')
@@ -31,8 +31,12 @@ class IGcodeInstaller(bpy.types.Operator):
             Pip.install('tqdm')
 
             import re
-            import tqdm
+            from tqdm import tqdm
+
+            for _ in tqdm(range(1)):
+                print(re.__version__)
+
             self.report({'INFO'}, 'Successfully installed Re and Tqdm.')
-        except:
+        except ModuleNotFoundError:
             self.report({'ERROR'}, 'Could not install Regex and Tqdm, Kindly install it manually.')
         return {'FINISHED'}
