@@ -33,12 +33,10 @@ def register():
     bpy.utils.register_class(IGcodePreferences)
     bpy.utils.register_class(IGcodeInstaller)
     bpy.utils.register_class(ImportGcode)
-    
     bpy.types.TOPBAR_MT_file_import.append(menu_func_import)
 
 def unregister():
     bpy.utils.unregister_class(IGcodePreferences)
     bpy.utils.unregister_class(IGcodeInstaller)
     bpy.utils.unregister_class(ImportGcode)
-
     bpy.types.TOPBAR_MT_file_import.remove(menu_func_import)
