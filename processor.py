@@ -109,12 +109,15 @@ class ImportGcode(bpy.types.Operator, ImportHelper):
                         ops.curve.vertex_add(location=v[1:])
                         if v[0] == 0:
                             ops.curve.select_all(action='DESELECT')
-                            layer.data.splines[index].bezier_points[-1].select_control_point = True
-                            layer.data.splines[index].bezier_points[-2].select_control_point = True
+                            if len(layer.data.splines[index].bezier_points) > 1:
+                                layer.data.splines[index].bezier_points[-1].select_control_point = True
+                            if len(layer.data.splines[index].bezier_points) > 2:
+                                layer.data.splines[index].bezier_points[-2].select_control_point = True
                             ops.curve.delete(type='SEGMENT')
                             ops.curve.select_all(action='DESELECT')
                             layer.data.splines[-1].bezier_points[-1].select_control_point = True
                             index += 1
+
 
                     ops.object.editmode_toggle()
                     context.object.data.twist_mode = 'Z_UP'
